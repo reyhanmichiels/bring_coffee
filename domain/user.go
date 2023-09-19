@@ -2,17 +2,23 @@ package domain
 
 import (
 	"time"
-
-	"github.com/oklog/ulid/v2"
 )
 
 type User struct {
-	ID              ulid.ULID `json:"id" gorm:"type:uuid;not null;primary key"`
-	Name            string    `json:"name" gorm:"type:varchar(50);not null"`
-	Email           string    `json:"email" gorm:"type:varchar(20); not null;unique"`
-	Password        string    `json:"password" gorm:"type:varchar(20); not null"`
+	ID              string    `json:"id" gorm:"type:varchar(100);not null;primary key"`
+	Name            string    `json:"name" gorm:"type:varchar(100);not null"`
+	Email           string    `json:"email" gorm:"type:varchar(100); not null;unique"`
+	Password        string    `json:"password" gorm:"type:varchar(100); not null"`
 	PhoneNumber     string    `json:"phone_number" gorm:"type:varchar(15); not null"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 	EmailVerifiedAt time.Time `json:"deleted_at"`
+}
+
+type RegistBind struct {
+	Name                  string `json:"name" binding:"required,max=20,min=3"`
+	PhoneNumber           string `json:"phone_number" binding:"required,numeric,min=10"`
+	Email                 string `json:"email" binding:"required,email"`
+	Password              string `json:"password" binding:"required,min=8"`
+	Verification_Password string `json:"verification_password" binding:"required,min=8"`
 }

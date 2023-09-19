@@ -24,7 +24,9 @@ func (rest *Rest) RouteHealthCheck() {
 }
 
 func (rest *Rest) RouteUser(userHandler *user_handler.UserHandler) {
+	v1 := rest.gin.Group("/api/v1")
 
+	v1.POST("/regist", userHandler.Registration)
 }
 
 func (rest *Rest) Serve() {
