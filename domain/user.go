@@ -10,6 +10,7 @@ type User struct {
 	Email       string    `json:"email" gorm:"type:varchar(100); not null;unique"`
 	Password    string    `json:"password" gorm:"type:varchar(100); not null"`
 	PhoneNumber string    `json:"phone_number" gorm:"type:varchar(15); not null"`
+	OTPCode     string    `json:"otp_code" gorm:"type:char(4)"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	IsVerified  bool      `json:"is_verified" gorm:"type:boolean;default:false"`
