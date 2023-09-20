@@ -20,10 +20,13 @@ func NewUserRepository(db *gorm.DB) IUserRepository {
 }
 
 func (userRepo *UserRepository) CreateUser(user *domain.User) error {
-	err := userRepo.db.Create(user).Error
+	tx := userRepo.db.Begin()
+	
+	err := tx.Create(user).Error
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	return nil
+	return tx.Commit().Error
 }
