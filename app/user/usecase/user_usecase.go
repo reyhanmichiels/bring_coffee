@@ -93,14 +93,6 @@ func (userUsecase *UserUsecase) RegistrationUsecase(request domain.RegistBind) (
 		}
 	}
 
-	err = userUsecase.UserRepo.StoreOTP(user.Email, code)
-	if err != nil {
-		return "", util.ErrorObject{
-			Code:    http.StatusInternalServerError,
-			Message: "failed store otp code to database",
-			Err:     err,
-		}
-	}
 	return user.ID, nil
 }
 
@@ -119,15 +111,6 @@ func (userUsecase *UserUsecase) VerifyAccountUsecase(request domain.VerifyAccoun
 			Code:    http.StatusBadRequest,
 			Message: "otp doesn't same",
 			Err:     errors.New(""),
-		}
-	}
-
-	err = userUsecase.UserRepo.RemoveOTP(request.Email)
-	if err != nil {
-		return util.ErrorObject{
-			Code:    http.StatusInternalServerError,
-			Message: "failed remove otp from db",
-			Err:     err,
 		}
 	}
 
