@@ -3,6 +3,7 @@ module github.com/reyhanmichiels/bring_coffee
 go 1.21.0
 
 require (
+	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/bytedance/sonic v1.10.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
@@ -29,6 +30,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/oklog/ulid/v2 v2.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pquerna/otp v1.4.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.5.0 // indirect
@@ -37,6 +39,8 @@ require (
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.5.1 // indirect
 	gorm.io/driver/postgres v1.5.2 // indirect

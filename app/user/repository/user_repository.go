@@ -1,9 +1,13 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"github.com/reyhanmichiels/bring_coffee/domain"
+	"gorm.io/gorm"
+)
 
 type IUserRepository interface {
-
+	CreateUser(user *domain.User) error
+	ActivateAccount(userEmail string) error
 }
 
 type UserRepository struct {
@@ -14,4 +18,28 @@ func NewUserRepository(db *gorm.DB) IUserRepository {
 	return &UserRepository{
 		db: db,
 	}
+}
+
+func (userRepo *UserRepository) CreateUser(user *domain.User) error {
+	tx := userRepo.db.Begin()
+
+	err := tx.Create(user).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+func (userRepo *UserRepository) ActivateAccount(userEmail string) error {
+	tx := userRepo.db.Begin()
+
+	err := tx.Model(&domain.User{}).Where("email = ?", userEmail).Update("is_verified", true).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
