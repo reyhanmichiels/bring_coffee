@@ -95,3 +95,62 @@ func TestRegistrationSuccessInput(t *testing.T) {
 		})
 	}
 }
+
+func TestVerifyAccountSuccessInput(t *testing.T) {
+	request := []domain.VerifyAccountBind{
+		{
+			Email: "test1@test.com",
+			Code:  "1111",
+		},
+		{
+			Email: "test2@test.com",
+			Code:  "2111",
+		},
+		{
+			Email: "test3@test.com",
+			Code:  "3111",
+		},
+		{
+			Email: "test4@test.com",
+			Code:  "4111",
+		},
+		{
+			Email: "test5@test.com",
+			Code:  "5111",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: verify account (handler), test: Success Input %d", i+1), func(t *testing.T) {
+			callFunction := userUsecaseMock.Mock.On("VerifyAccountUsecase", v).Return(nil)
+
+			engine := gin.Default()
+			engine.POST("/api/v1/users/verify", userHandler.VerifyAccount)
+
+			requestDataInJson, err := json.Marshal(v)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			response := httptest.NewRecorder()
+			request, err := http.NewRequest("POST", "/api/v1/users/verify", bytes.NewBuffer(requestDataInJson))
+			if err != nil {
+				t.Fatal(err)
+			}
+			engine.ServeHTTP(response, request)
+
+			var responseBody map[string]any
+			err = json.Unmarshal(response.Body.Bytes(), &responseBody)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, http.StatusOK, response.Code, "http status code should be equal")
+			assert.Equal(t, "success", responseBody["status"], "status should be equal")
+			assert.Equal(t, "successfully verified account", responseBody["message"], "message should be equal")
+			assert.Nil(t, responseBody["data"], "data should be nil")
+
+			callFunction.Unset()
+		})
+	}
+}
