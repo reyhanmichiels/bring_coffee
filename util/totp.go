@@ -35,7 +35,7 @@ func ValidateOTP(code string) (bool, error) {
 
 func SendOTP(name, email, code string) error {
 	mailer := gomail.NewMessage()
-	mailer.SetHeader("From", "Bring Coffee")
+	mailer.SetHeader("From", os.Getenv("SMTP_EMAIL"))
 	mailer.SetHeader("To", email)
 	mailer.SetHeader("Subject", "Your OTP Code")
 	body := fmt.Sprintf("Hello %s, Welcome to Bring Coffee\n This is your OTP Code\n%s\nThis code only valid for 5 minutes", name, code)
