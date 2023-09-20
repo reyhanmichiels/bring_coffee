@@ -19,5 +19,10 @@ func (userUsecase *UserUsecaseMock) RegistrationUsecase(request domain.RegistBin
 }
 
 func (userUsecase *UserUsecaseMock) VerifyAccountUsecase(request domain.VerifyAccountBind) interface{} {
+	args := userUsecase.Mock.Called(request)
+	if args[0] != nil {
+		return args[0]
+	}
+
 	return nil
 }
