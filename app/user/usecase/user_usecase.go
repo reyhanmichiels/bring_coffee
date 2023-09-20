@@ -13,6 +13,7 @@ import (
 
 type IUserUsecase interface {
 	RegistrationUsecase(request domain.RegistBind) (string, interface{})
+	VerifyAccountUsecase(request domain.VerifyAccountBind) interface{}
 }
 
 type UserUsecase struct {
@@ -101,4 +102,43 @@ func (userUsecase *UserUsecase) RegistrationUsecase(request domain.RegistBind) (
 		}
 	}
 	return user.ID, nil
+}
+
+func (userUsecase *UserUsecase) VerifyAccountUsecase(request domain.VerifyAccountBind) interface{} {
+	ok, err := util.ValidateOTP(request.Code)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "otp validation failed",
+			Err:     err,
+		}
+	}
+
+	if !ok {
+		return util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "otp doesn't same",
+			Err:     errors.New(""),
+		}
+	}
+
+	err = userUsecase.UserRepo.RemoveOTP(request.Email)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed remove otp from db",
+			Err:     err,
+		}
+	}
+
+	err = userUsecase.UserRepo.ActivateAccount(request.Email)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed activate account",
+			Err:     err,
+		}
+	}
+
+	return nil
 }

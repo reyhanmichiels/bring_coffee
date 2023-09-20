@@ -23,3 +23,8 @@ type RegistBind struct {
 	Password              string `json:"password" binding:"required,min=8"`
 	Verification_Password string `json:"verification_password" binding:"required,min=8"`
 }
+
+type VerifyAccountBind struct {
+	Email string `json:"email" binding:"required,email"`
+	Code  string `json:"code" binding:"required,max=4,min=4"`
+}

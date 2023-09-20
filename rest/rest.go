@@ -27,6 +27,7 @@ func (rest *Rest) RouteUser(userHandler *user_handler.UserHandler) {
 	v1 := rest.gin.Group("/api/v1")
 
 	v1.POST("/regist", userHandler.Registration)
+	v1.POST("/users/verify", userHandler.VerifyAccount)
 }
 
 func (rest *Rest) Serve() {

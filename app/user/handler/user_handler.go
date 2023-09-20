@@ -36,3 +36,21 @@ func (userHandler *UserHandler) Registration(c *gin.Context) {
 
 	util.SuccessedResponse(c, http.StatusCreated, "successfully registration new user", apiData)
 }
+
+func (userHandler *UserHandler) VerifyAccount(c *gin.Context) {
+	var request domain.VerifyAccountBind
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		util.FailedResponse(c, http.StatusBadRequest, "failed bind input data", err)
+		return
+	}
+
+	errObject := userHandler.UserUsecase.VerifyAccountUsecase(request)
+	if errObject != nil {
+		errObject := errObject.(util.ErrorObject)
+		util.FailedResponse(c, errObject.Code, errObject.Message, errObject.Err)
+		return
+	}
+
+	util.SuccessedResponse(c, http.StatusOK, "successfully verified account", nil)
+}

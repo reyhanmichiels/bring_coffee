@@ -8,6 +8,8 @@ import (
 type IUserRepository interface {
 	CreateUser(user *domain.User) error
 	StoreOTP(userEmail, code string) error
+	RemoveOTP(userEmail string) error
+	ActivateAccount(userEmail string) error
 }
 
 type UserRepository struct {
@@ -36,6 +38,30 @@ func (userRepo *UserRepository) StoreOTP(userEmail, code string) error {
 	tx := userRepo.db.Begin()
 
 	err := tx.Model(&domain.User{}).Where("email = ?", userEmail).Update("otp_code", code).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+func (userRepo *UserRepository) RemoveOTP(userEmail string) error {
+	tx := userRepo.db.Begin()
+
+	err := tx.Model(&domain.User{}).Where("email = ?", userEmail).Update("otp_code", "").Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+func (userRepo *UserRepository) ActivateAccount(userEmail string) error {
+	tx := userRepo.db.Begin()
+
+	err := tx.Model(&domain.User{}).Where("email = ?", userEmail).Update("is_verified", true).Error
 	if err != nil {
 		tx.Rollback()
 		return err
