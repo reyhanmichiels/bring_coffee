@@ -91,5 +91,14 @@ func (userUsecase *UserUsecase) RegistrationUsecase(request domain.RegistBind) (
 			Err:     err,
 		}
 	}
+
+	err = userUsecase.UserRepo.StoreOTP(user.Email, code)
+	if err != nil {
+		return "", util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed store otp code to database",
+			Err:     err,
+		}
+	}
 	return user.ID, nil
 }
