@@ -74,5 +74,22 @@ func (userUsecase *UserUsecase) RegistrationUsecase(request domain.RegistBind) (
 		}
 	}
 
+	code, err := util.GenerateOTP()
+	if err != nil {
+		return "", util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to generate OTP",
+			Err:     err,
+		}
+	}
+
+	err = util.SendOTP(user.Name, user.Email, code)
+	if err != nil {
+		return "", util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to send OTP",
+			Err:     err,
+		}
+	}
 	return user.ID, nil
 }
