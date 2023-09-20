@@ -61,7 +61,7 @@ func TestRegistrationSuccessInput(t *testing.T) {
 	}
 
 	for i, v := range request {
-		t.Run(fmt.Sprintf("feat: registration, test: Success Input %d", i+1), func(t *testing.T) {
+		t.Run(fmt.Sprintf("feat: registration (handler), test: Success Input %d", i+1), func(t *testing.T) {
 			functionResponse := fmt.Sprint("test", 1)
 			callFunction := userUsecaseMock.Mock.On("RegistrationUsecase", v).Return(functionResponse, nil)
 
