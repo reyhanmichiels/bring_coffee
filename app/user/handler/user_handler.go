@@ -54,3 +54,21 @@ func (userHandler *UserHandler) VerifyAccount(c *gin.Context) {
 
 	util.SuccessedResponse(c, http.StatusOK, "successfully verified account", nil)
 }
+
+func (userHandler *UserHandler) SendOTP(c *gin.Context) {
+	var request domain.SendOTPBind
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		util.FailedResponse(c, http.StatusBadRequest, "failed bind input data", err)
+		return
+	}
+
+	errObject := userHandler.UserUsecase.SendOTPUsecase(request)
+	if errObject != nil {
+		errObject := errObject.(util.ErrorObject)
+		util.FailedResponse(c, errObject.Code, errObject.Message, errObject.Err)
+		return
+	}
+
+	util.SuccessedResponse(c, http.StatusOK, "successfully send OTP", nil)
+}

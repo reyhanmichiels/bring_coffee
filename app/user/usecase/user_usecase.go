@@ -14,6 +14,7 @@ import (
 type IUserUsecase interface {
 	RegistrationUsecase(request domain.RegistBind) (string, interface{})
 	VerifyAccountUsecase(request domain.VerifyAccountBind) interface{}
+	SendOTPUsecase(request domain.SendOTPBind) interface{}
 }
 
 type UserUsecase struct {
@@ -119,6 +120,41 @@ func (userUsecase *UserUsecase) VerifyAccountUsecase(request domain.VerifyAccoun
 		return util.ErrorObject{
 			Code:    http.StatusInternalServerError,
 			Message: "failed activate account",
+			Err:     err,
+		}
+	}
+
+	return nil
+}
+
+func (userUsecase *UserUsecase) SendOTPUsecase(request domain.SendOTPBind) interface{} {
+	user := struct {
+		Name  string
+		Email string
+	}{}
+	err := userUsecase.UserRepo.FindUserByCondition(&user, "email = ?", request.Email)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "email not found",
+			Err:     err,
+		}
+	}
+
+	code, err := util.GenerateOTP()
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to generate OTP",
+			Err:     err,
+		}
+	}
+
+	err = util.SendOTP(user.Name, user.Email, code)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to send OTP",
 			Err:     err,
 		}
 	}
