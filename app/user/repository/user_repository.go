@@ -8,7 +8,7 @@ import (
 type IUserRepository interface {
 	CreateUser(user *domain.User) error
 	ActivateAccount(userEmail string) error
-	FindUserByCondition(user interface{}, conditon string, value interface{}) error
+	FindUserByCondition(user interface{}, condition string, value interface{}) error
 }
 
 type UserRepository struct {
