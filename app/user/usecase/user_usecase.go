@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	user_repository "github.com/reyhanmichiels/bring_coffee/app/user/repository"
 	"github.com/reyhanmichiels/bring_coffee/domain"
 	"github.com/reyhanmichiels/bring_coffee/util"
@@ -15,6 +16,7 @@ type IUserUsecase interface {
 	RegistrationUsecase(request domain.RegistBind) (string, interface{})
 	VerifyAccountUsecase(request domain.VerifyAccountBind) interface{}
 	SendOTPUsecase(request domain.SendOTPBind) interface{}
+	BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{})
 }
 
 type UserUsecase struct {
@@ -160,4 +162,49 @@ func (userUsecase *UserUsecase) SendOTPUsecase(request domain.SendOTPBind) inter
 	}
 
 	return nil
+}
+
+func (userUsecase *UserUsecase) BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{}) {
+	var user domain.User
+	err := userUsecase.UserRepo.FindUserByCondition(&user, "email = ?", request.Email)
+	if err != nil {
+		return nil, util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "account not found",
+			Err:     err,
+		}
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
+	if err != nil {
+		return nil, util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "credential doesn't match",
+			Err:     err,
+		}
+	}
+
+	if !user.IsVerified {
+		return nil, util.ErrorObject{
+			Code:    http.StatusUnauthorized,
+			Message: "user is not verified",
+			Err:     errors.New(""),
+		}
+	}
+
+	token, err := util.GenerateJWT(c, user.ID)
+	if err != nil {
+		return nil, util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to generate jwt token",
+			Err:     err,
+		}
+	}
+
+	apiResponse := struct {
+		Token string `json:"token"`
+	}{
+		token,
+	}
+	return apiResponse, nil
 }
