@@ -8,6 +8,7 @@ import (
 type IUserRepository interface {
 	CreateUser(user *domain.User) error
 	ActivateAccount(userEmail string) error
+	FindUserByCondition(user interface{}, conditon string, value interface{}) error
 }
 
 type UserRepository struct {
@@ -42,4 +43,13 @@ func (userRepo *UserRepository) ActivateAccount(userEmail string) error {
 	}
 
 	return tx.Commit().Error
+}
+
+func (userRepo *UserRepository) FindUserByCondition(user interface{}, conditon string, value interface{}) error {
+	err := userRepo.db.Model(domain.User{}).First(user, conditon, value).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
