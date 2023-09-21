@@ -154,3 +154,57 @@ func TestVerifyAccountSuccessInput(t *testing.T) {
 		})
 	}
 }
+
+func TestSendOTPSuccessInput(t *testing.T) {
+	request := []domain.SendOTPBind{
+		{
+			Email: "test1@gmail.com",
+		},
+		{
+			Email: "test2@gmail.com",
+		},
+		{
+			Email: "test3@gmail.com",
+		},
+		{
+			Email: "test4@gmail.com",
+		},
+		{
+			Email: "test5@gmail.com",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: send otp (handler), test: Success Input %d", i+1), func(t *testing.T) {
+			callFunction := userUsecaseMock.Mock.On("SendOTPUsecase", v).Return(nil)
+
+			engine := gin.Default()
+			engine.POST("/api/v1/users/otp", userHandler.SendOTP)
+
+			requestDataInJson, err := json.Marshal(v)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			response := httptest.NewRecorder()
+			request, err := http.NewRequest("POST", "/api/v1/users/otp", bytes.NewBuffer(requestDataInJson))
+			if err != nil {
+				t.Fatal(err)
+			}
+			engine.ServeHTTP(response, request)
+
+			var responseBody map[string]any
+			err = json.Unmarshal(response.Body.Bytes(), &responseBody)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, http.StatusOK, response.Code, "http status code should be equal")
+			assert.Equal(t, "success", responseBody["status"], "status should be equal")
+			assert.Equal(t, "successfully send OTP", responseBody["message"], "message should be equal")
+			assert.Nil(t, responseBody["data"], "data should be nil")
+
+			callFunction.Unset()
+		})
+	}
+}

@@ -26,3 +26,12 @@ func (userUsecase *UserUsecaseMock) VerifyAccountUsecase(request domain.VerifyAc
 
 	return nil
 }
+
+func (userUsecase *UserUsecaseMock) SendOTPUsecase(request domain.SendOTPBind) interface{} {
+	args := userUsecase.Mock.Called(request)
+	if args[0] != nil {
+		return args[0]
+	}
+
+	return nil
+}
