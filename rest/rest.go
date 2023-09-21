@@ -28,6 +28,7 @@ func (rest *Rest) RouteUser(userHandler *user_handler.UserHandler) {
 
 	v1.POST("/regist", userHandler.Registration)
 	v1.POST("/users/verify", userHandler.VerifyAccount)
+	v1.POST("/users/otp", userHandler.SendOTP)
 }
 
 func (rest *Rest) Serve() {
