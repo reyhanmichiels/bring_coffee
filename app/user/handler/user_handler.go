@@ -72,3 +72,21 @@ func (userHandler *UserHandler) SendOTP(c *gin.Context) {
 
 	util.SuccessedResponse(c, http.StatusOK, "successfully send OTP", nil)
 }
+
+func (userHandler *UserHandler) BasicLogin(c *gin.Context) {
+	var request domain.BasicLoginBind
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		util.FailedResponse(c, http.StatusBadRequest, "failed bind input data", err)
+		return
+	}
+
+	apiData, errObject := userHandler.UserUsecase.BasicLoginUsecase(c, request)
+	if errObject != nil {
+		errObject := errObject.(util.ErrorObject)
+		util.FailedResponse(c, errObject.Code, errObject.Message, errObject.Err)
+		return
+	}
+
+	util.SuccessedResponse(c, http.StatusOK, "successfully login", apiData)
+}
