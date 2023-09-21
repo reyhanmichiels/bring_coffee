@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/reyhanmichiels/bring_coffee/domain"
 	"github.com/stretchr/testify/mock"
 )
@@ -34,4 +35,13 @@ func (userUsecase *UserUsecaseMock) SendOTPUsecase(request domain.SendOTPBind) i
 	}
 
 	return nil
+}
+
+func (userUsecase *UserUsecaseMock) BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{}) {
+	args := userUsecase.Mock.Called(request)
+	if args[1] != nil {
+		return nil, args[1]
+	}
+
+	return args[0], nil
 }
