@@ -208,3 +208,68 @@ func TestSendOTPSuccessInput(t *testing.T) {
 		})
 	}
 }
+
+func TestBasicLoginSuccessInput(t *testing.T) {
+	request := []domain.BasicLoginBind{
+		{
+			Email:    "test1@test.com",
+			Password: "testpass1",
+		},
+		{
+			Email:    "test2@test.com",
+			Password: "testpass2",
+		},
+		{
+			Email:    "test3@test.com",
+			Password: "testpass3",
+		},
+		{
+			Email:    "test4@test.com",
+			Password: "testpass4",
+		},
+		{
+			Email:    "test5s@test.com",
+			Password: "testpass5s",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: basic login (handler), test: Success Input %d", i+1), func(t *testing.T) {
+			functionResponse := struct {
+				Token string `json:"token"`
+			}{
+				"testToken",
+			}
+			callFunction := userUsecaseMock.Mock.On("BasicLoginUsecase", v).Return(functionResponse, nil)
+
+			engine := gin.Default()
+			engine.POST("/auth/basic/login", userHandler.BasicLogin)
+
+			requestDataInJson, err := json.Marshal(v)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			response := httptest.NewRecorder()
+			request, err := http.NewRequest("POST", "/auth/basic/login", bytes.NewBuffer(requestDataInJson))
+			if err != nil {
+				t.Fatal(err)
+			}
+			engine.ServeHTTP(response, request)
+
+			var responseBody map[string]any
+			err = json.Unmarshal(response.Body.Bytes(), &responseBody)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			responseData := responseBody["data"].(map[string]any)
+			assert.Equal(t, http.StatusOK, response.Code, "http status code should be equal")
+			assert.Equal(t, "success", responseBody["status"], "status should be equal")
+			assert.Equal(t, "successfully login", responseBody["message"], "message should be equal")
+			assert.Equal(t, responseData["token"], "testToken", "token should be equal")
+
+			callFunction.Unset()
+		})
+	}
+}
