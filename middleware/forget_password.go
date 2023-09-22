@@ -11,8 +11,8 @@ import (
 
 func ForgetPassword(c *gin.Context) {
 	bearerToken := c.Request.Header.Get("Authorization")
-	token := strings.Split(bearerToken, "")[1]
-	if token == "" {
+	token := strings.Split(bearerToken, " ")
+	if len(token) != 2 {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"status":  "error",
 			"message": "failed to get your jwt token",
@@ -20,7 +20,7 @@ func ForgetPassword(c *gin.Context) {
 		})
 	}
 
-	email, tokenExpireTime, err := util.ParsesAndValidateJWT(token)
+	email, tokenExpireTime, err := util.ParsesAndValidateTokenForgetPassword(token[1])
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"status":  "error",
