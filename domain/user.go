@@ -36,3 +36,8 @@ type BasicLoginBind struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
+
+type ForgetPasswordBind struct {
+	Password              string `json:"password" binding:"required,min=8"`
+	Verification_Password string `json:"verification_password" binding:"required,min=8"`
+}
