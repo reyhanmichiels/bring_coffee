@@ -9,6 +9,7 @@ type IUserRepository interface {
 	CreateUser(user *domain.User) error
 	ActivateAccount(userEmail string) error
 	FindUserByCondition(user interface{}, condition string, value interface{}) error
+	Update(user *domain.User, userUpdateData interface{}) error
 }
 
 type UserRepository struct {
@@ -52,4 +53,16 @@ func (userRepo *UserRepository) FindUserByCondition(user interface{}, condition 
 	}
 
 	return nil
+}
+
+func (userRepo *UserRepository) Update(user *domain.User, userUpdateData interface{}) error {
+	tx := userRepo.db.Begin()
+
+	err := tx.Model(user).Updates(userUpdateData).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }

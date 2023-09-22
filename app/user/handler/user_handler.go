@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -106,5 +107,28 @@ func (userHandler *UserHandler) VerifyForgetPassword(c *gin.Context) {
 		return
 	}
 
-	util.SuccessedResponse(c, http.StatusOK, "successfully verified account", apiData)
+	util.SuccessedResponse(c, http.StatusOK, "successfully verified forget password", apiData)
+}
+
+func (userHandler *UserHandler) ForgetPassword(c *gin.Context) {
+	var request domain.ForgetPasswordBind
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		util.FailedResponse(c, http.StatusBadRequest, "failed bind input data", err)
+		return
+	}
+
+	email, ok := c.Get("email")
+	if !ok {
+		util.FailedResponse(c, http.StatusInternalServerError, "user email not found", errors.New(""))
+	}
+
+	errObject := userHandler.UserUsecase.ForgetPasswordUsecase(c, email.(string), request)
+	if errObject != nil {
+		errObject := errObject.(util.ErrorObject)
+		util.FailedResponse(c, errObject.Code, errObject.Message, errObject.Err)
+		return
+	}
+
+	util.SuccessedResponse(c, http.StatusOK, "successfully reset password", nil)
 }
