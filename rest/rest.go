@@ -26,10 +26,10 @@ func (rest *Rest) RouteHealthCheck() {
 func (rest *Rest) RouteUser(userHandler *user_handler.UserHandler) {
 	v1 := rest.gin.Group("/api/v1")
 
-	v1.POST("/regist", userHandler.Registration)
+	rest.gin.POST("/api/auth/regist", userHandler.Registration)
 	v1.POST("/users/verify", userHandler.VerifyAccount)
 	v1.POST("/users/otp", userHandler.SendOTP)
-	rest.gin.POST("/auth/basic/login", userHandler.BasicLogin)
+	rest.gin.POST("/api/auth/basic/login", userHandler.BasicLogin)
 }
 
 func (rest *Rest) Serve() {
