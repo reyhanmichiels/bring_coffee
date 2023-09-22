@@ -45,3 +45,21 @@ func (userUsecase *UserUsecaseMock) BasicLoginUsecase(c *gin.Context, request do
 
 	return args[0], nil
 }
+
+func (userUsecase *UserUsecaseMock) VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{}) {
+	args := userUsecase.Mock.Called(request)
+	if args[1] != nil {
+		return nil, args[1]
+	}
+
+	return args[0], nil
+}
+
+func (userUsecase *UserUsecaseMock) ForgetPasswordUsecase(c *gin.Context, email string, request domain.ForgetPasswordBind) interface{} {
+	args := userUsecase.Mock.Called(email, request)
+	if args[0] != nil {
+		return args[0]
+	}
+
+	return nil
+}
