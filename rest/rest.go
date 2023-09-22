@@ -30,6 +30,8 @@ func (rest *Rest) RouteUser(userHandler *user_handler.UserHandler) {
 	v1.POST("/users/verify", userHandler.VerifyAccount)
 	v1.POST("/users/otp", userHandler.SendOTP)
 	rest.gin.POST("/api/auth/basic/login", userHandler.BasicLogin)
+	v1.POST("/users/verify-fp", userHandler.VerifyForgetPassword)
+
 }
 
 func (rest *Rest) Serve() {

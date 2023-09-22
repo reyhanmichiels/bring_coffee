@@ -17,6 +17,7 @@ type IUserUsecase interface {
 	VerifyAccountUsecase(request domain.VerifyAccountBind) interface{}
 	SendOTPUsecase(request domain.SendOTPBind) interface{}
 	BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{})
+	VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{})
 }
 
 type UserUsecase struct {
@@ -197,6 +198,41 @@ func (userUsecase *UserUsecase) BasicLoginUsecase(c *gin.Context, request domain
 		return nil, util.ErrorObject{
 			Code:    http.StatusInternalServerError,
 			Message: "failed to generate jwt token",
+			Err:     err,
+		}
+	}
+
+	apiResponse := struct {
+		Token string `json:"token"`
+	}{
+		token,
+	}
+	return apiResponse, nil
+}
+
+func (userUsecase *UserUsecase) VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{}) {
+	ok, err := util.ValidateOTP(request.Code)
+	if err != nil {
+		return nil, util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "otp validation failed",
+			Err:     err,
+		}
+	}
+
+	if !ok {
+		return nil, util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "otp doesn't same",
+			Err:     errors.New(""),
+		}
+	}
+
+	token, err := util.GenerateTokenForgetPassword(c, request.Email)
+	if err != nil {
+		return nil, util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to generate OTP",
 			Err:     err,
 		}
 	}
