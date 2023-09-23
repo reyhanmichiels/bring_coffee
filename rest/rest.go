@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/gin-gonic/gin"
 	user_handler "github.com/reyhanmichiels/bring_coffee/app/user/handler"
+	"github.com/reyhanmichiels/bring_coffee/middleware"
 )
 
 type Rest struct {
@@ -26,10 +27,12 @@ func (rest *Rest) RouteHealthCheck() {
 func (rest *Rest) RouteUser(userHandler *user_handler.UserHandler) {
 	v1 := rest.gin.Group("/api/v1")
 
-	v1.POST("/regist", userHandler.Registration)
+	rest.gin.POST("/api/auth/regist", userHandler.Registration)
 	v1.POST("/users/verify", userHandler.VerifyAccount)
 	v1.POST("/users/otp", userHandler.SendOTP)
-	rest.gin.POST("/auth/basic/login", userHandler.BasicLogin)
+	rest.gin.POST("/api/auth/basic/login", userHandler.BasicLogin)
+	v1.POST("/users/verify-fp", userHandler.VerifyForgetPassword)
+	v1.POST("/users/forget-password", middleware.ForgetPassword, userHandler.ForgetPassword)
 }
 
 func (rest *Rest) Serve() {

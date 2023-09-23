@@ -66,7 +66,7 @@ func TestRegistrationSuccessInput(t *testing.T) {
 			callFunction := userUsecaseMock.Mock.On("RegistrationUsecase", v).Return(functionResponse, nil)
 
 			engine := gin.Default()
-			engine.POST("/api/v1/regist", userHandler.Registration)
+			engine.POST("/api/auth/regist", userHandler.Registration)
 
 			requestDataInJson, err := json.Marshal(v)
 			if err != nil {
@@ -74,7 +74,7 @@ func TestRegistrationSuccessInput(t *testing.T) {
 			}
 
 			response := httptest.NewRecorder()
-			request, err := http.NewRequest("POST", "/api/v1/regist", bytes.NewBuffer(requestDataInJson))
+			request, err := http.NewRequest("POST", "/api/auth/regist", bytes.NewBuffer(requestDataInJson))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -243,7 +243,7 @@ func TestBasicLoginSuccessInput(t *testing.T) {
 			callFunction := userUsecaseMock.Mock.On("BasicLoginUsecase", v).Return(functionResponse, nil)
 
 			engine := gin.Default()
-			engine.POST("/auth/basic/login", userHandler.BasicLogin)
+			engine.POST("/api/auth/basic/login", userHandler.BasicLogin)
 
 			requestDataInJson, err := json.Marshal(v)
 			if err != nil {
@@ -251,7 +251,7 @@ func TestBasicLoginSuccessInput(t *testing.T) {
 			}
 
 			response := httptest.NewRecorder()
-			request, err := http.NewRequest("POST", "/auth/basic/login", bytes.NewBuffer(requestDataInJson))
+			request, err := http.NewRequest("POST", "/api/auth/basic/login", bytes.NewBuffer(requestDataInJson))
 			if err != nil {
 				t.Fatal(err)
 			}

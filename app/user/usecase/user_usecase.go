@@ -17,6 +17,8 @@ type IUserUsecase interface {
 	VerifyAccountUsecase(request domain.VerifyAccountBind) interface{}
 	SendOTPUsecase(request domain.SendOTPBind) interface{}
 	BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{})
+	VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{})
+	ForgetPasswordUsecase(c *gin.Context, email string, request domain.ForgetPasswordBind) interface{}
 }
 
 type UserUsecase struct {
@@ -207,4 +209,85 @@ func (userUsecase *UserUsecase) BasicLoginUsecase(c *gin.Context, request domain
 		token,
 	}
 	return apiResponse, nil
+}
+
+func (userUsecase *UserUsecase) VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{}) {
+	ok, err := util.ValidateOTP(request.Code)
+	if err != nil {
+		return nil, util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "otp validation failed",
+			Err:     err,
+		}
+	}
+
+	if !ok {
+		return nil, util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "otp doesn't same",
+			Err:     errors.New(""),
+		}
+	}
+
+	token, err := util.GenerateTokenForgetPassword(c, request.Email)
+	if err != nil {
+		return nil, util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to generate OTP",
+			Err:     err,
+		}
+	}
+
+	apiResponse := struct {
+		Token string `json:"token"`
+	}{
+		token,
+	}
+	return apiResponse, nil
+}
+
+func (userUsecase *UserUsecase) ForgetPasswordUsecase(c *gin.Context, email string, request domain.ForgetPasswordBind) interface{} {
+	if request.Password != request.Verification_Password {
+		return util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "password and verification password doesn't same",
+			Err:     errors.New(""),
+		}
+	}
+
+	var user domain.User
+	err := userUsecase.UserRepo.FindUserByCondition(&user, "email = ?", email)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "email not found",
+			Err:     err,
+		}
+	}
+
+	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to hash password",
+			Err:     err,
+		}
+	}
+
+	userUpdateData := struct {
+		Password string
+	}{
+		string(password),
+	}
+
+	err = userUsecase.UserRepo.Update(&user, userUpdateData)
+	if err != nil {
+		return util.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "failed to change password",
+			Err:     err,
+		}
+	}
+
+	return nil
 }
