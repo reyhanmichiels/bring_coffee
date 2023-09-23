@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/reyhanmichiels/bring_coffee/domain"
 	"github.com/stretchr/testify/mock"
 )
@@ -37,7 +36,7 @@ func (userUsecase *UserUsecaseMock) SendOTPUsecase(request domain.SendOTPBind) i
 	return nil
 }
 
-func (userUsecase *UserUsecaseMock) BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{}) {
+func (userUsecase *UserUsecaseMock) BasicLoginUsecase(request domain.BasicLoginBind) (interface{}, interface{}) {
 	args := userUsecase.Mock.Called(request)
 	if args[1] != nil {
 		return nil, args[1]
@@ -46,7 +45,7 @@ func (userUsecase *UserUsecaseMock) BasicLoginUsecase(c *gin.Context, request do
 	return args[0], nil
 }
 
-func (userUsecase *UserUsecaseMock) VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{}) {
+func (userUsecase *UserUsecaseMock) VerifyForgetPasswordUsecase(request domain.VerifyAccountBind) (interface{}, interface{}) {
 	args := userUsecase.Mock.Called(request)
 	if args[1] != nil {
 		return nil, args[1]
@@ -55,7 +54,7 @@ func (userUsecase *UserUsecaseMock) VerifyForgetPasswordUsecase(c *gin.Context, 
 	return args[0], nil
 }
 
-func (userUsecase *UserUsecaseMock) ForgetPasswordUsecase(c *gin.Context, email string, request domain.ForgetPasswordBind) interface{} {
+func (userUsecase *UserUsecaseMock) ForgetPasswordUsecase(email string, request domain.ForgetPasswordBind) interface{} {
 	args := userUsecase.Mock.Called(email, request)
 	if args[0] != nil {
 		return args[0]
