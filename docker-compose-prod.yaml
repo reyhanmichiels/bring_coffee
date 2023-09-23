@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  bring_coffee_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bring_coffee_app
+    image: bring_coffee
+    ports:
+      - "8080:8080"
+    networks:
+      - bring_coffee_network
+    depends_on:
+      - bring_coffee_db
+    restart: on-failure
