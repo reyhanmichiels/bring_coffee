@@ -25,3 +25,7 @@ func (userRepo *UserRepositoryMock) ActivateAccount(userEmail string) error {
 func (userRepo *UserRepositoryMock) FindUserByCondition(user interface{}, conditon string, value interface{}) error {
 	return nil
 }
+
+func (userRepo *UserRepositoryMock) Update(user *domain.User, userUpdateData interface{}) error {
+	return nil
+}

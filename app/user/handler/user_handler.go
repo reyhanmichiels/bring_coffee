@@ -82,7 +82,7 @@ func (userHandler *UserHandler) BasicLogin(c *gin.Context) {
 		return
 	}
 
-	apiData, errObject := userHandler.UserUsecase.BasicLoginUsecase(c, request)
+	apiData, errObject := userHandler.UserUsecase.BasicLoginUsecase(request)
 	if errObject != nil {
 		errObject := errObject.(util.ErrorObject)
 		util.FailedResponse(c, errObject.Code, errObject.Message, errObject.Err)
@@ -100,7 +100,7 @@ func (userHandler *UserHandler) VerifyForgetPassword(c *gin.Context) {
 		return
 	}
 
-	apiData, errObject := userHandler.UserUsecase.VerifyForgetPasswordUsecase(c, request)
+	apiData, errObject := userHandler.UserUsecase.VerifyForgetPasswordUsecase(request)
 	if errObject != nil {
 		errObject := errObject.(util.ErrorObject)
 		util.FailedResponse(c, errObject.Code, errObject.Message, errObject.Err)
@@ -123,7 +123,7 @@ func (userHandler *UserHandler) ForgetPassword(c *gin.Context) {
 		util.FailedResponse(c, http.StatusInternalServerError, "user email not found", errors.New(""))
 	}
 
-	errObject := userHandler.UserUsecase.ForgetPasswordUsecase(c, email.(string), request)
+	errObject := userHandler.UserUsecase.ForgetPasswordUsecase(email.(string), request)
 	if errObject != nil {
 		errObject := errObject.(util.ErrorObject)
 		util.FailedResponse(c, errObject.Code, errObject.Message, errObject.Err)
