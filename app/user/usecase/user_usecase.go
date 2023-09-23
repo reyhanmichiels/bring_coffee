@@ -65,7 +65,7 @@ func (userUsecase *UserUsecase) RegistrationUsecase(request domain.RegistBind) (
 		Password:    string(password),
 	}
 
-	err = userUsecase.UserRepo.CreateUser(&user)
+	user, err = userUsecase.UserRepo.CreateUser(user)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if strings.Contains(err.Error(), "Duplicate entry") {

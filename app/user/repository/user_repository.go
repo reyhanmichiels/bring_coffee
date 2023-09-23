@@ -6,7 +6,7 @@ import (
 )
 
 type IUserRepository interface {
-	CreateUser(user *domain.User) error
+	CreateUser(user domain.User) (domain.User, error)
 	ActivateAccount(userEmail string) error
 	FindUserByCondition(user interface{}, condition string, value interface{}) error
 	Update(user *domain.User, userUpdateData interface{}) error
@@ -22,16 +22,16 @@ func NewUserRepository(db *gorm.DB) IUserRepository {
 	}
 }
 
-func (userRepo *UserRepository) CreateUser(user *domain.User) error {
+func (userRepo *UserRepository) CreateUser(user domain.User) (domain.User, error) {
 	tx := userRepo.db.Begin()
 
 	err := tx.Create(user).Error
 	if err != nil {
 		tx.Rollback()
-		return err
+		return domain.User{}, err
 	}
 
-	return tx.Commit().Error
+	return user, tx.Commit().Error
 }
 
 func (userRepo *UserRepository) ActivateAccount(userEmail string) error {

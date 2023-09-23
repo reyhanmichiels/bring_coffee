@@ -9,8 +9,8 @@ type UserRepositoryMock struct {
 	Mock mock.Mock
 }
 
-func (userRepo *UserRepositoryMock) CreateUser(user *domain.User) error {
-	return nil
+func (userRepo *UserRepositoryMock) CreateUser(user domain.User) (domain.User, error) {
+	return domain.User{}, nil
 }
 
 func (userRepo *UserRepositoryMock) ActivateAccount(userEmail string) error {
