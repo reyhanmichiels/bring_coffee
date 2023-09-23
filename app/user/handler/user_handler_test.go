@@ -273,3 +273,135 @@ func TestBasicLoginSuccessInput(t *testing.T) {
 		})
 	}
 }
+
+func TestVerifyForgetPasswordSuccessInput(t *testing.T) {
+	request := []domain.VerifyAccountBind{
+		{
+			Email: "test1@test.com",
+			Code:  "1111",
+		},
+		{
+			Email: "test2@test.com",
+			Code:  "2111",
+		},
+		{
+			Email: "test3@test.com",
+			Code:  "3111",
+		},
+		{
+			Email: "test4@test.com",
+			Code:  "4111",
+		},
+		{
+			Email: "test5@test.com",
+			Code:  "5111",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: verify forget password (handler), test: Success Input %d", i+1), func(t *testing.T) {
+			apiResponse := struct {
+				Token string `json:"token"`
+			}{
+				"testToken",
+			}
+			callFunction := userUsecaseMock.Mock.On("VerifyForgetPasswordUsecase", v).Return(apiResponse, nil)
+
+			engine := gin.Default()
+			engine.POST("/api/v1/users/verify-fp", userHandler.VerifyForgetPassword)
+
+			requestDataInJson, err := json.Marshal(v)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			response := httptest.NewRecorder()
+			request, err := http.NewRequest("POST", "/api/v1/users/verify-fp", bytes.NewBuffer(requestDataInJson))
+			if err != nil {
+				t.Fatal(err)
+			}
+			engine.ServeHTTP(response, request)
+
+			var responseBody map[string]any
+			err = json.Unmarshal(response.Body.Bytes(), &responseBody)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			responseData := responseBody["data"].(map[string]any)
+			assert.Equal(t, http.StatusOK, response.Code, "http status code should be equal")
+			assert.Equal(t, "success", responseBody["status"], "status should be equal")
+			assert.Equal(t, "successfully verified forget password", responseBody["message"], "message should be equal")
+			assert.Equal(t, responseData["token"], "testToken", "token should be equal")
+
+			callFunction.Unset()
+		})
+	}
+}
+
+func TestForgetPasswordSuccessInput(t *testing.T) {
+	request := []domain.ForgetPasswordBind{
+		{
+			Password:              "testpass1",
+			Verification_Password: "testpass1",
+		},
+		{
+			Password:              "testpass2",
+			Verification_Password: "testpass2",
+		},
+		{
+			Password:              "testpass3",
+			Verification_Password: "testpass3",
+		},
+		{
+			Password:              "testpass4",
+			Verification_Password: "testpass4",
+		},
+		{
+			Password:              "testpass5",
+			Verification_Password: "testpass5",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: forget password (handler), test: Success Input %d", i+1), func(t *testing.T) {
+			callFunction := userUsecaseMock.Mock.On("ForgetPasswordUsecase", getEmail(), v).Return(nil)
+
+			engine := gin.Default()
+			engine.POST("/api/v1/users/forget-password", middlewareSetEmail, userHandler.ForgetPassword)
+
+			requestDataInJson, err := json.Marshal(v)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			response := httptest.NewRecorder()
+			request, err := http.NewRequest("POST", "/api/v1/users/forget-password", bytes.NewBuffer(requestDataInJson))
+			if err != nil {
+				t.Fatal(err)
+			}
+			engine.ServeHTTP(response, request)
+
+			var responseBody map[string]any
+			err = json.Unmarshal(response.Body.Bytes(), &responseBody)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, http.StatusOK, response.Code, "http status code should be equal")
+			assert.Equal(t, "success", responseBody["status"], "status should be equal")
+			assert.Equal(t, "successfully reset password", responseBody["message"], "message should be equal")
+			
+			callFunction.Unset()
+		})
+	}
+}
+
+func middlewareSetEmail(c *gin.Context) {
+	c.Set("email", "test@test.com")
+	c.Next()
+}
+
+func getEmail() string {
+	return "test@test.com"
+}

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	user_repository "github.com/reyhanmichiels/bring_coffee/app/user/repository"
 	"github.com/reyhanmichiels/bring_coffee/domain"
 	"github.com/reyhanmichiels/bring_coffee/util"
@@ -16,9 +15,9 @@ type IUserUsecase interface {
 	RegistrationUsecase(request domain.RegistBind) (string, interface{})
 	VerifyAccountUsecase(request domain.VerifyAccountBind) interface{}
 	SendOTPUsecase(request domain.SendOTPBind) interface{}
-	BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{})
-	VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{})
-	ForgetPasswordUsecase(c *gin.Context, email string, request domain.ForgetPasswordBind) interface{}
+	BasicLoginUsecase(request domain.BasicLoginBind) (interface{}, interface{})
+	VerifyForgetPasswordUsecase(request domain.VerifyAccountBind) (interface{}, interface{})
+	ForgetPasswordUsecase(email string, request domain.ForgetPasswordBind) interface{}
 }
 
 type UserUsecase struct {
@@ -166,7 +165,7 @@ func (userUsecase *UserUsecase) SendOTPUsecase(request domain.SendOTPBind) inter
 	return nil
 }
 
-func (userUsecase *UserUsecase) BasicLoginUsecase(c *gin.Context, request domain.BasicLoginBind) (interface{}, interface{}) {
+func (userUsecase *UserUsecase) BasicLoginUsecase(request domain.BasicLoginBind) (interface{}, interface{}) {
 	var user domain.User
 	err := userUsecase.UserRepo.FindUserByCondition(&user, "email = ?", request.Email)
 	if err != nil {
@@ -194,7 +193,7 @@ func (userUsecase *UserUsecase) BasicLoginUsecase(c *gin.Context, request domain
 		}
 	}
 
-	token, err := util.GenerateJWT(c, user.ID)
+	token, err := util.GenerateJWT(user.ID)
 	if err != nil {
 		return nil, util.ErrorObject{
 			Code:    http.StatusInternalServerError,
@@ -211,7 +210,7 @@ func (userUsecase *UserUsecase) BasicLoginUsecase(c *gin.Context, request domain
 	return apiResponse, nil
 }
 
-func (userUsecase *UserUsecase) VerifyForgetPasswordUsecase(c *gin.Context, request domain.VerifyAccountBind) (interface{}, interface{}) {
+func (userUsecase *UserUsecase) VerifyForgetPasswordUsecase(request domain.VerifyAccountBind) (interface{}, interface{}) {
 	ok, err := util.ValidateOTP(request.Code)
 	if err != nil {
 		return nil, util.ErrorObject{
@@ -229,7 +228,7 @@ func (userUsecase *UserUsecase) VerifyForgetPasswordUsecase(c *gin.Context, requ
 		}
 	}
 
-	token, err := util.GenerateTokenForgetPassword(c, request.Email)
+	token, err := util.GenerateTokenForgetPassword(request.Email)
 	if err != nil {
 		return nil, util.ErrorObject{
 			Code:    http.StatusInternalServerError,
@@ -246,7 +245,7 @@ func (userUsecase *UserUsecase) VerifyForgetPasswordUsecase(c *gin.Context, requ
 	return apiResponse, nil
 }
 
-func (userUsecase *UserUsecase) ForgetPasswordUsecase(c *gin.Context, email string, request domain.ForgetPasswordBind) interface{} {
+func (userUsecase *UserUsecase) ForgetPasswordUsecase(email string, request domain.ForgetPasswordBind) interface{} {
 	if request.Password != request.Verification_Password {
 		return util.ErrorObject{
 			Code:    http.StatusBadRequest,

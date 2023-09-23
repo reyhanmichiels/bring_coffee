@@ -5,11 +5,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateJWT(c *gin.Context, userId string) (string, error) {
+func GenerateJWT(userId string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userId,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
@@ -42,7 +41,7 @@ func ParsesAndValidateJWT(tokenString string) (string, float64, error) {
 	return claims["user_id"].(string), claims["exp"].(float64), nil
 }
 
-func GenerateTokenForgetPassword(c *gin.Context, email string) (string, error) {
+func GenerateTokenForgetPassword(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"exp":   time.Now().Add(time.Minute * 5).Unix(),
