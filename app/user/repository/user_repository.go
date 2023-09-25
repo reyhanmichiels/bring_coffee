@@ -6,9 +6,9 @@ import (
 )
 
 type IUserRepository interface {
-	CreateUser(user domain.User) (domain.User, error)
+	CreateUser(user *domain.User) (*domain.User, error)
 	ActivateAccount(userEmail string) error
-	FindUserByCondition(user interface{}, condition string, value interface{}) error
+	FindUserByCondition(user domain.User, condition string, value interface{}, column []string) (domain.User, error)
 	Update(user *domain.User, userUpdateData interface{}) error
 }
 
@@ -22,13 +22,13 @@ func NewUserRepository(db *gorm.DB) IUserRepository {
 	}
 }
 
-func (userRepo *UserRepository) CreateUser(user domain.User) (domain.User, error) {
+func (userRepo *UserRepository) CreateUser(user *domain.User) (*domain.User, error) {
 	tx := userRepo.db.Begin()
 
 	err := tx.Create(user).Error
 	if err != nil {
 		tx.Rollback()
-		return domain.User{}, err
+		return &domain.User{}, err
 	}
 
 	return user, tx.Commit().Error
@@ -46,13 +46,14 @@ func (userRepo *UserRepository) ActivateAccount(userEmail string) error {
 	return tx.Commit().Error
 }
 
-func (userRepo *UserRepository) FindUserByCondition(user interface{}, condition string, value interface{}) error {
-	err := userRepo.db.Model(domain.User{}).First(user, condition, value).Error
+func (userRepo *UserRepository) FindUserByCondition(user domain.User, condition string, value interface{}, column []string) (domain.User, error) {
+	// err := userRepo.db.Model(domain.User{}).First(user, condition, value).Error
+	err := userRepo.db.Select(column).First(user, condition, value).Error
 	if err != nil {
-		return err
+		return domain.User{}, err
 	}
 
-	return nil
+	return domain.User{}, nil
 }
 
 func (userRepo *UserRepository) Update(user *domain.User, userUpdateData interface{}) error {
