@@ -8,6 +8,7 @@ import (
 	"github.com/reyhanmichiels/bring_coffee/infrastructure"
 	"github.com/reyhanmichiels/bring_coffee/infrastructure/postgresql"
 	"github.com/reyhanmichiels/bring_coffee/rest"
+	"github.com/reyhanmichiels/bring_coffee/util"
 )
 
 func main() {
@@ -20,11 +21,14 @@ func main() {
 	//migrate DB
 	postgresql.Migrate()
 
+	//init mail
+	mail := util.NewMail()
+
 	//init repo
 	userRepo := user_repository.NewUserRepository(postgresql.DB)
 
 	//init usecase
-	userUsecase := user_usecase.NewUserUsecase(userRepo)
+	userUsecase := user_usecase.NewUserUsecase(userRepo, mail)
 
 	//init handler
 	userHandler := user_handler.NewUserHandler(userUsecase)

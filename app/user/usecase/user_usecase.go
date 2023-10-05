@@ -22,11 +22,13 @@ type IUserUsecase interface {
 
 type UserUsecase struct {
 	UserRepo user_repository.IUserRepository
+	Mail     util.IMail
 }
 
-func NewUserUsecase(userRepo user_repository.IUserRepository) IUserUsecase {
+func NewUserUsecase(userRepo user_repository.IUserRepository, mail util.IMail) IUserUsecase {
 	return &UserUsecase{
 		UserRepo: userRepo,
+		Mail:     mail,
 	}
 }
 
@@ -88,7 +90,7 @@ func (userUsecase *UserUsecase) RegistrationUsecase(request domain.RegistBind) (
 		}
 	}
 
-	err = util.SendOTP(user.Name, user.Email, code)
+	err = userUsecase.Mail.SendOTP(user.Name, user.Email, code)
 	if err != nil {
 		return "", util.ErrorObject{
 			Code:    http.StatusInternalServerError,
@@ -153,7 +155,7 @@ func (userUsecase *UserUsecase) SendOTPUsecase(request domain.SendOTPBind) inter
 		}
 	}
 
-	err = util.SendOTP(user.Name, user.Email, code)
+	err = userUsecase.Mail.SendOTP(user.Name, user.Email, code)
 	if err != nil {
 		return util.ErrorObject{
 			Code:    http.StatusInternalServerError,
