@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/reyhanmichiels/bring_coffee/app/mail"
 	"github.com/reyhanmichiels/bring_coffee/app/user/repository"
 	"github.com/reyhanmichiels/bring_coffee/domain"
 	"github.com/reyhanmichiels/bring_coffee/util"
@@ -15,7 +16,11 @@ var userRepositoryMock = repository.UserRepositoryMock{
 	Mock: mock.Mock{},
 }
 
-var userUsecase = NewUserUsecase(&userRepositoryMock)
+var mailMock = mail.MailMock{
+	Mock: mock.Mock{},
+}
+
+var userUsecase = NewUserUsecase(&userRepositoryMock, &mailMock)
 
 func TestVerifyAccountUsecaseSuccessInput(t *testing.T) {
 	code, _ := util.GenerateOTP()
