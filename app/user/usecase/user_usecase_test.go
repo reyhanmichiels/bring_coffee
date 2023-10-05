@@ -59,3 +59,59 @@ func TestVerifyAccountUsecaseSuccessInput(t *testing.T) {
 		})
 	}
 }
+
+func TestRegistrationUsecaseSuccessInput(t *testing.T) {
+	request := []domain.RegistBind{
+		{
+			Name:                  "test",
+			PhoneNumber:           "000000000000",
+			Email:                 "test@test.com",
+			Password:              "testpass",
+			Verification_Password: "testpass",
+		},
+		{
+			Name:                  "test",
+			PhoneNumber:           "000000000000",
+			Email:                 "test@test.com",
+			Password:              "testpass",
+			Verification_Password: "testpass",
+		},
+		{
+			Name:                  "test",
+			PhoneNumber:           "000000000000",
+			Email:                 "test@test.com",
+			Password:              "testpass",
+			Verification_Password: "testpass",
+		},
+		{
+			Name:                  "test",
+			PhoneNumber:           "000000000000",
+			Email:                 "test@test.com",
+			Password:              "testpass",
+			Verification_Password: "testpass",
+		},
+		{
+			Name:                  "test",
+			PhoneNumber:           "000000000000",
+			Email:                 "test@test.com",
+			Password:              "testpass",
+			Verification_Password: "testpass",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: registration (usecase), test: Success Input %d", i+1), func(t *testing.T) {
+			functionCall := userRepositoryMock.Mock.On("CreateUser", mock.Anything).Return(nil)
+			functionCall2 := mailMock.Mock.On("SendOTP", v.Name, v.Email, mock.Anything).Return(nil)
+
+			result, errObject := userUsecase.RegistrationUsecase(v)
+
+			assert.Nil(t, errObject)
+			assert.NotNil(t, result)
+
+			functionCall.Unset()
+			functionCall2.Unset()
+		})
+	}
+
+}
