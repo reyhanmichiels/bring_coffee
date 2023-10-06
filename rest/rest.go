@@ -16,6 +16,10 @@ func NewRest(gin *gin.Engine) Rest {
 	}
 }
 
+func (rest *Rest) HandleCORS() {
+	rest.gin.Use(middleware.CORS)
+}
+
 func (rest *Rest) RouteHealthCheck() {
 	rest.gin.GET("/api/health-check", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{

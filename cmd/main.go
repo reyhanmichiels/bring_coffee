@@ -36,6 +36,9 @@ func main() {
 	//init rest
 	rest := rest.NewRest(gin.Default())
 
+	//cors
+	rest.HandleCORS()
+
 	//init healtch check
 	rest.RouteHealthCheck()
 
