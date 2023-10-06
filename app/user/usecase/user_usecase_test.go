@@ -10,6 +10,7 @@ import (
 	"github.com/reyhanmichiels/bring_coffee/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var userRepositoryMock = repository.UserRepositoryMock{
@@ -157,6 +158,50 @@ func TestSendOTPUsecaseSuccessInput(t *testing.T) {
 
 			functionCall.Unset()
 			functionCall2.Unset()
+		})
+	}
+}
+
+func TestBasicLoginUsecaseSuccessInput(t *testing.T) {
+	request := []domain.BasicLoginBind{
+		{
+			Email:    "test@test.com",
+			Password: "password",
+		},
+		{
+			Email:    "test@test.com",
+			Password: "password",
+		},
+		{
+			Email:    "test@test.com",
+			Password: "password",
+		},
+		{
+			Email:    "test@test.com",
+			Password: "password",
+		},
+		{
+			Email:    "test@test.com",
+			Password: "password",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: BasicLogin (usecase), test: Success Input %d", i+1), func(t *testing.T) {
+			password, _ := bcrypt.GenerateFromPassword([]byte(v.Password), 10)
+
+			functionCall := userRepositoryMock.Mock.On("FindUserByCondition", &domain.User{}, "email = ?", v.Email).Return(nil).Run(func(args mock.Arguments) {
+				arg := args.Get(0).(*domain.User)
+				arg.Email = v.Email
+				arg.Password = string(password)
+				arg.IsVerified = true
+			})
+
+			_, errObject := userUsecase.BasicLoginUsecase(v)
+
+			assert.Nil(t, errObject)
+
+			functionCall.Unset()
 		})
 	}
 }
