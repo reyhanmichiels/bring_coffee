@@ -205,3 +205,36 @@ func TestBasicLoginUsecaseSuccessInput(t *testing.T) {
 		})
 	}
 }
+
+func TestVerifyForgetPasswordUsecase(t *testing.T) {
+	code, _ := util.GenerateOTP()
+	request := []domain.VerifyAccountBind{
+		{
+			Email: "test@test.com",
+			Code:  code,
+		},
+		{
+			Email: "test@test.com",
+			Code:  code,
+		},
+		{
+			Email: "test@test.com",
+			Code:  code,
+		},
+		{
+			Email: "test@test.com",
+			Code:  code,
+		},
+		{
+			Email: "test@test.com",
+			Code:  code,
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: BasicLogin (usecase), test: Success Input %d", i+1), func(t *testing.T) {
+			_, errObject := userUsecase.VerifyForgetPasswordUsecase(v)
+			assert.Nil(t, errObject)
+		})
+	}
+}
