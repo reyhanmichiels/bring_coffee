@@ -115,3 +115,48 @@ func TestRegistrationUsecaseSuccessInput(t *testing.T) {
 	}
 
 }
+
+func TestSendOTPUsecaseSuccessInput(t *testing.T) {
+	request := []domain.SendOTPBind{
+		{
+			Email: "test@test.com",
+		},
+		{
+			Email: "test@test.com",
+		},
+		{
+			Email: "test@test.com",
+		},
+		{
+			Email: "test@test.com",
+		},
+		{
+			Email: "test@test.com",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: SendOTP (usecase), test: Success Input %d", i+1), func(t *testing.T) {
+			user := struct {
+				Name  string
+				Email string
+			}{}
+
+			functionCall := userRepositoryMock.Mock.On("FindUserByCondition", &user, "email = ?", v.Email).Return(nil).Run(func(args mock.Arguments) {
+				arg := args.Get(0).(*struct {
+					Name  string
+					Email string
+				})
+				arg.Email = v.Email
+				arg.Name = "testname"
+			})
+			functionCall2 := mailMock.Mock.On("SendOTP", "testname", v.Email, mock.Anything).Return(nil)
+
+			errObject := userUsecase.SendOTPUsecase(v)
+			assert.Nil(t, errObject)
+
+			functionCall.Unset()
+			functionCall2.Unset()
+		})
+	}
+}
