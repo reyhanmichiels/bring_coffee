@@ -232,9 +232,49 @@ func TestVerifyForgetPasswordUsecase(t *testing.T) {
 	}
 
 	for i, v := range request {
-		t.Run(fmt.Sprintf("feat: BasicLogin (usecase), test: Success Input %d", i+1), func(t *testing.T) {
+		t.Run(fmt.Sprintf("feat: Verify Forget Password (usecase), test: Success Input %d", i+1), func(t *testing.T) {
 			_, errObject := userUsecase.VerifyForgetPasswordUsecase(v)
 			assert.Nil(t, errObject)
+		})
+	}
+}
+
+func TestForgetPasswordUsecase(t *testing.T) {
+	request := []domain.ForgetPasswordBind{
+		{
+			Password:              "password",
+			Verification_Password: "password",
+		},
+		{
+			Password:              "password",
+			Verification_Password: "password",
+		},
+		{
+			Password:              "password",
+			Verification_Password: "password",
+		},
+		{
+			Password:              "password",
+			Verification_Password: "password",
+		},
+		{
+			Password:              "password",
+			Verification_Password: "password",
+		},
+	}
+
+	for i, v := range request {
+		t.Run(fmt.Sprintf("feat: ForgetPassword (usecase), test: Success Input %d", i+1), func(t *testing.T) {
+			var user domain.User
+
+			functionCall := userRepositoryMock.Mock.On("FindUserByCondition", &user, "email = ?", "test@test.com").Return(nil)
+			functionCall2 := userRepositoryMock.Mock.On("Update", &user, mock.Anything).Return(nil)
+
+			errObject := userUsecase.ForgetPasswordUsecase("test@test.com", v)
+			assert.Nil(t, errObject)
+
+			functionCall.Unset()
+			functionCall2.Unset()
 		})
 	}
 }
